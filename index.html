@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tubr Storage — Creator Program Dashboard (2026-08-27)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light dark;
+    --ink: #0B0D12;
+    --paper: #F6F3EC;
+    --paper2: #ECE7D9;
+    --blue: #2447FF;
+    --blue-tint: #7C90FF;
+    --lime: #D6FF3F;
+    --muted: #6B6558;
+    --line: #DCD5C2;
+    --card: #FFFFFF;
+    --fg: var(--ink);
+    --bg: var(--paper);
+    --track: rgba(11,13,18,0.06);
+    --th-fg: var(--ink);
+    --chart-neutral: var(--ink);
+    --header-line-opacity: 1;
+    --delta-down-bg: rgba(107,101,88,0.15);
+    --delta-na-bg: rgba(107,101,88,0.1);
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    margin: 0; padding: 2rem 1.4rem 3rem; max-width: 1120px; margin-inline: auto;
+    color: var(--fg); background: var(--bg);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper2: #1B1F29;
+      --muted: #9C937F;
+      --line: #262B38;
+      --card: #14171F;
+      --fg: var(--paper);
+      --bg: var(--ink);
+      --track: rgba(255,255,255,0.08);
+      --th-fg: #9AA0B4;
+      --chart-neutral: #3A4256;
+      --header-line-opacity: 0.6;
+      --delta-down-bg: rgba(255,255,255,0.12);
+      --delta-na-bg: rgba(255,255,255,0.08);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper2: #1B1F29;
+    --muted: #9C937F;
+    --line: #262B38;
+    --card: #14171F;
+    --fg: var(--paper);
+    --bg: var(--ink);
+    --track: rgba(255,255,255,0.08);
+    --th-fg: #9AA0B4;
+    --chart-neutral: #3A4256;
+    --header-line-opacity: 0.6;
+    --delta-down-bg: rgba(255,255,255,0.12);
+    --delta-na-bg: rgba(255,255,255,0.08);
+  }
+  h1,h2,h3,.wordmark,.tab,.page-tab,th,.label,button { font-family: 'Space Grotesk', sans-serif; }
+
+  .header { position: relative; padding: 0.4rem 0 1.6rem; display: flex; align-items: flex-start; gap: 0.7rem; flex-wrap: wrap; }
+  .header::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--blue);
+    opacity: var(--header-line-opacity);
+  }
+  .flag-icon { flex-shrink: 0; margin-top: 0.35rem; color: var(--fg); }
+  .header-text { flex: 1; min-width: 240px; }
+  .agency-tag { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.15rem; }
+  .wordmark { font-size: 2rem; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
+  .wordmark .tubr { color: var(--fg); }
+  .wordmark .storage { color: var(--blue); }
+  .tagline { font-size: 0.9rem; color: var(--muted); margin: 0.3rem 0 1rem; }
+  h1 { font-size: 1.4rem; font-weight: 700; margin: 0 0 0.15rem; }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 2.2rem 0 0.6rem; border-bottom: 2px solid var(--line); padding-bottom: 0.4rem; }
+  h3 { font-size: 0.98rem; font-weight: 600; margin: 1.3rem 0 0.4rem; }
+  .subtitle { color: var(--muted); font-size: 0.88rem; margin-bottom: 0.4rem; }
+
+  .page-tabs { display: flex; gap: 0.4rem; margin: 0.6rem 0 0.2rem; border-bottom: 2px solid var(--line); }
+  .page-tab { padding: 0.55rem 1.1rem; border: none; background: transparent; cursor: pointer; font-size: 0.94rem;
+    font-weight: 600; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; }
+  .page-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+  .tabs-row { display: flex; gap: 0.5rem; margin: 0.9rem 0 1.1rem; flex-wrap: wrap; }
+  .tab { padding: 0.4rem 1.05rem; border-radius: 999px; border: 2px solid var(--line); background: transparent;
+    cursor: pointer; font-size: 0.84rem; font-weight: 600; color: var(--muted); }
+  .tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  .alert { border-left: 4px solid; padding: 0.7rem 1rem; border-radius: 6px; background: var(--paper2); margin-bottom: 0.6rem; font-size: 0.92rem; }
+  .alert.warning { border-color: var(--blue); }
+  .alert.ok { border-color: var(--fg); }
+
+  .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1rem 0; }
+  @media (max-width: 720px) { .metric-grid { grid-template-columns: repeat(2, 1fr); } }
+  .metric-card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 0.85rem 1rem; }
+  .metric-card .label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; }
+  .metric-card .value { font-size: 1.5rem; font-weight: 700; margin: 0.15rem 0; font-family: 'Space Grotesk', sans-serif; }
+  .metric-card .delta { font-size: 0.78rem; padding: 0.1rem 0.45rem; border-radius: 4px; display: inline-block; font-weight: 600; }
+  .delta.up { background: rgba(36,71,255,0.1); color: var(--blue); }
+  .delta.down { background: var(--delta-down-bg); color: var(--fg); }
+  .delta.na { background: var(--delta-na-bg); color: var(--muted); }
+
+  .bars { margin: 1rem 0; }
+  .bar-row { display: flex; align-items: center; gap: 0.8rem; margin: 0.5rem 0; }
+  .bar-row .bar-label { width: 46px; font-size: 0.85rem; color: var(--muted); text-align: right; font-weight: 600; }
+  .bar-row .bar-track { flex: 1; background: var(--track); border-radius: 4px; height: 28px; position: relative; }
+  .bar-row .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 10px;
+    color: #fff; font-weight: 600; font-size: 0.82rem; white-space: nowrap; min-width: 46px; }
+
+  .funnel-row { margin: 0.4rem 0; }
+  .funnel-row .fbar { color: #fff; font-weight: 600; padding: 0.55rem 0.9rem; border-radius: 4px; font-size: 0.85rem;
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem; white-space: nowrap; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0.8rem 0 1.4rem; font-size: 0.86rem; border-radius: 6px; overflow: hidden;
+    background: var(--card); border: 1px solid var(--line); }
+  th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--line); }
+  th { color: var(--th-fg); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; background: var(--paper2); letter-spacing: 0.03em; }
+  a { color: var(--blue); font-weight: 600; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .caption { font-size: 0.8rem; color: var(--muted); }
+  .hidden { display: none; }
+  .pill { display: inline-block; padding: 0.12rem 0.55rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; background: var(--lime); color: var(--ink); }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0 1rem; }
+  .chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 0.35rem 0.85rem; font-size: 0.85rem; font-weight: 600; }
+  footer { margin-top: 2.6rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: 0.8rem; color: var(--muted); }
+  .slider-row { margin: 0.6rem 0 1rem; font-size: 0.9rem; }
+  input[type="range"] { accent-color: var(--blue); vertical-align: middle; }
+
+  .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0 1.4rem; }
+  @media (max-width: 860px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .gallery-grid { grid-template-columns: 1fr; } }
+  .vcard { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+    text-decoration: none; color: var(--fg); transition: transform 0.12s ease; }
+  .vcard:hover { transform: translateY(-2px); text-decoration: none; }
+  .vcard .thumb-wrap { position: relative; width: 100%; aspect-ratio: 9 / 12; background: var(--paper2); overflow: hidden; }
+  .vcard .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .vcard .rank { position: absolute; top: 0.5rem; left: 0.5rem; background: var(--ink); color: #fff; font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.72rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 4px; }
+  .vcard .sale-tag { position: absolute; top: 0.5rem; right: 0.5rem; background: var(--lime); color: var(--ink); font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.68rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 4px; }
+  .vcard .body { padding: 0.65rem 0.7rem 0.75rem; }
+  .vcard .handle { font-weight: 700; font-size: 0.88rem; }
+  .vcard .product-tag { font-size: 0.72rem; color: var(--muted); margin: 0.15rem 0 0.5rem; }
+  .vcard .stats { display: flex; gap: 0.7rem; font-size: 0.78rem; color: var(--muted); }
+  .vcard .stats strong { color: var(--fg); font-family: 'Space Grotesk', sans-serif; }
+
+  .strategy-list { list-style: none; margin: 0.8rem 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; }
+  .strategy-list li { background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--blue);
+    border-radius: 6px; padding: 0.7rem 0.9rem; font-size: 0.9rem; }
+  .strategy-list strong { font-family: 'Space Grotesk', sans-serif; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <svg class="flag-icon" width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <line x1="8" y1="4" x2="8" y2="30" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M8 5 L27 10.5 L8 16 Z" fill="var(--blue)"/>
+  </svg>
+  <div class="header-text">
+    <div class="agency-tag">FlagshipGrowth — client report</div>
+    <div class="wordmark"><span class="tubr">Tübr</span> <span class="storage">Storage</span></div>
+    <div class="tagline">TikTok Shop Creator Program — full-service management for CPG brands growing on Amazon, TikTok Shop, and Walmart.</div>
+    <div class="subtitle">store <code>TubrStorage</code> (shop_id 7903) · snapshot as of 2026-08-27 (data as of yesterday) · generated 2026-08-29, YTD view added 2026-08-31</div>
+  </div>
+</div>
+
+<div class="page-tabs" id="page-tabs">
+  <button class="page-tab active" data-page="dashboard">Dashboard</button>
+  <button class="page-tab" data-page="creators">Creators</button>
+  <button class="page-tab" data-page="gallery">Gallery</button>
+  <button class="page-tab" data-page="units">Units</button>
+  <button class="page-tab" data-page="opportunities">Opportunities</button>
+  <button class="page-tab" data-page="samples">Samples</button>
+</div>
+
+<div id="page-dashboard" class="page-view">
+
+<div class="tabs-row" id="period-tabs">
+  <button class="tab active" data-period="7d">Last 7 days</button>
+  <button class="tab" data-period="mtd">Month to date</button>
+  <button class="tab" data-period="ytd">Year to date</button>
+</div>
+
+<h2>Needs attention</h2>
+<div id="alerts"></div>
+
+<h2>Program health</h2>
+<div class="metric-grid" id="health-metrics"></div>
+<div class="caption" id="health-caption" style="margin-top:0.3rem"></div>
+
+<div class="bars">
+  <div class="caption" style="margin-bottom:0.5rem"><strong>Affiliate GMV by window</strong> (each bar is that view's total, not cumulative). Separately, trailing 30 days: affiliate GMV was $1,114.95 of $1,574.41 total shop GMV (70.8%) — the rest came from product-card/search/shop-tab, not creator content.</div>
+  <div id="gmv-bars"></div>
+</div>
+
+<h2>Store health (SPS)</h2>
+<div class="caption">TikTok's Shop Performance Score, 0–5 scale, snapshot as of 2026-08-27. Reacher's daily history for this store only goes back to 2026-08-25 — SPS tracking just started collecting here, so there isn't a longer trend to chart yet.</div>
+<div class="metric-grid" style="grid-template-columns: repeat(3, 1fr); max-width: 640px;">
+  <div class="metric-card"><div class="label">SPS score</div><div class="value">4.6<span style="font-size:0.95rem; color:var(--muted); font-weight:500"> / 5</span></div></div>
+  <div class="metric-card"><div class="label">Tier</div><div class="value" style="font-size:1.15rem">Excellent</div></div>
+  <div class="metric-card"><div class="label">Peer percentile</div><div class="value">90th</div></div>
+</div>
+<h3>By dimension</h3>
+<div id="sps-bars"></div>
+<div class="caption">Weight is each dimension's share of the overall score. Customer service is the relative weak point — still "Good," but the only dimension not rated "Excellent."</div>
+
+<h2>Outreach funnel</h2>
+<div class="metric-card" style="margin-bottom:1rem; max-width:420px">
+  <div class="label">Creators reached (DM/TC/email outreach) — far larger than the funnel stages below</div>
+  <div class="value" id="reached-value"></div>
+</div>
+<div id="funnel"></div>
+<div id="funnel-conversion" class="caption" style="margin-top:0.6rem"></div>
+
+<h2>Content &amp; sample pipeline</h2>
+<div class="metric-grid">
+  <div class="metric-card"><div class="label">In transit (shipped + ready to ship)</div><div class="value">32</div></div>
+  <div class="metric-card"><div class="label">Awaiting content</div><div class="value">25</div></div>
+  <div class="metric-card"><div class="label">Overdue for a post</div><div class="value" style="color:var(--berry-dark)">10</div></div>
+  <div class="metric-card"><div class="label">To review</div><div class="value">12</div></div>
+</div>
+<div class="caption">Completion rate 82.5% · 0 requests currently expiring · 487 cancelled/rejected to date, out of 831 requests all-time (pipeline totals are as-of-now, not period-specific).</div>
+
+<h3>Recent top-performing content (last 30 days, by GMV)</h3>
+<div class="caption">Sorted by GMV generated in the trailing 30 days.</div>
+<table>
+  <thead><tr><th>Creator</th><th>GMV ($)</th><th>Views</th><th>Likes</th><th>Engagement</th><th>Video</th></tr></thead>
+  <tbody id="top-videos-body"></tbody>
+</table>
+
+</div>
+
+<div id="page-creators" class="page-view hidden">
+
+<h2>Top creators (by roster GMV)</h2>
+<div class="caption">Pulled from the shop's My Creators roster, sorted by GMV. Only 15 of 818 total CRM affiliates shown.</div>
+<table>
+  <thead><tr><th>Creator</th><th>Status</th><th>GMV ($)</th><th>Commission ($)</th><th>Videos</th><th>Video views</th><th>Followers</th></tr></thead>
+  <tbody id="leaderboard-body"></tbody>
+</table>
+
+<h3>Re-engage: creators who've posted once and gone quiet</h3>
+<div class="caption">Of 211 recent affiliates (last 120 days), 144 posted exactly once and haven't reposted since — a large re-engagement pool. Only 11 are actively reposting in the last 30 days; 56 are lapsed repeat-posters. Showing 12 of 144.</div>
+<div class="chip-row" id="quiet-creators"></div>
+
+<h3 style="margin-top:1.6rem">Creator level distribution (trailing 30 days)</h3>
+<div class="caption">L0–L7 reflects TikTok's own creator tiering. Like most young programs, this one is concentrated in L0/L1, with a small L2 tier and almost nothing above it yet.</div>
+<div id="level-bars"></div>
+
+</div>
+
+<div id="page-gallery" class="page-view hidden">
+
+<h2>Video gallery</h2>
+<div class="caption">232 affiliate videos posted in the last 90 days (2026-05-30 to 2026-08-27, per Reacher's video log). Showing the top 50 by views.</div>
+<div class="gallery-grid" id="gallery-grid"></div>
+
+<h2>Strategy — how to push these videos</h2>
+<div class="caption">Grounded in what this specific batch of videos shows, not general playbook advice.</div>
+<ol class="strategy-list" id="strategy-list"></ol>
+
+</div>
+
+<div id="page-units" class="page-view hidden">
+
+<h2>GMV by unit (product)</h2>
+<div class="caption">Trailing 90 days (2026-05-30 to 2026-08-27), from Reacher's product list for this shop. Sorted by GMV. Only 6 of the shop's 31 listings sold anything in this window.</div>
+<table>
+  <thead><tr><th>Unit</th><th>GMV ($)</th><th>Units sold</th><th>Videos</th><th>Samples (90d)</th><th>CTR</th><th>Conversion</th></tr></thead>
+  <tbody id="unit-gmv-body"></tbody>
+</table>
+<div class="caption" id="unit-zero-caption"></div>
+
+<h2>Angles &amp; hooks that are working</h2>
+<div class="caption">Reacher hasn't run its AI hook/sell-point tagging for this shop's videos yet (0 of the top 20 highest-GMV videos in this window have that analysis attached) — the patterns below come from reading the actual captions and on-screen hooks of the top-performing videos directly, then adding up the GMV, views, and orders behind each one. All figures are from the 20 highest-GMV videos in the trailing 90 days (2026-05-30 to 2026-08-27), not the full video log.</div>
+<ol class="strategy-list" id="hooks-list"></ol>
+
+</div>
+
+<div id="page-opportunities" class="page-view hidden">
+
+<h2>Marketing opportunities to consider</h2>
+<div class="caption">Where this program has headroom beyond more creator outreach. Each item includes what it takes to actually stand it up.</div>
+<ol class="strategy-list" id="opportunities-list"></ol>
+
+<h2>Listing optimization</h2>
+<div class="caption">Reacher doesn't audit page content directly — these patterns come from comparing click-through against conversion across all 31 listings over the trailing 90 days (2026-05-30 to 2026-08-27). A wide gap between the two is usually a page-level fix, not a traffic problem.</div>
+<table>
+  <thead><tr><th>Product</th><th>CTR</th><th>Conversion</th><th>GMV / 1k impr</th><th>What the pattern suggests</th></tr></thead>
+  <tbody id="listing-opt-body"></tbody>
+</table>
+
+</div>
+
+<div id="page-samples" class="page-view hidden">
+
+<h2>Products set up for sampling</h2>
+<div class="caption">Of the shop's 31 listings, exactly 4 have any sample activity at all. Reacher's per-product auto-approval config and creator-quality profiles are both empty for this shop, so every one of these runs through a named Target Collab automation rather than Open Collaboration self-serve requests.</div>
+<table>
+  <thead><tr><th>Product</th><th>Sample requests (90d)</th><th>Used this month</th><th>Collaboration type</th></tr></thead>
+  <tbody id="samples-setup-body"></tbody>
+</table>
+<div class="caption">The other 27 listings — including all 5 collab/limited-edition SKUs — have never had a sample request. See Opportunities for what it takes to set up a Target Collab automation.</div>
+
+<h2>Open vs. targeted collaboration</h2>
+<div class="caption">Shop-wide picture, not just the 4 sampled products above.</div>
+<div class="alert ok">Open Collaboration isn't configured for any product — no auto-approval rules or ideal-creator profiles exist in Reacher for this shop. 100% of active sampling today is going out through Target Collab (targeted outreach), not TikTok's self-serve open marketplace.</div>
+
+<h3 style="margin-top:1.6rem">Active and notable Target Collab automations</h3>
+<div class="caption">25 Target Collab automations exist for this shop; most have already completed their run. These are the ones still moving, paused, or worth noting for scale.</div>
+<table>
+  <thead><tr><th>Automation</th><th>Status</th><th>Creators reached</th><th>Samples requested → approved</th><th>Videos posted</th><th>GMV ($)</th></tr></thead>
+  <tbody id="target-collab-body"></tbody>
+</table>
+
+</div>
+
+<script id="gallery-data" type="application/json">
+[
+  {"rank":1,"handle":"mastersonscarcare","product":"Stash Capsule","views":57760,"likes":262,"gmv":21.77,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7646586455166291214.jpg","url":"https://www.tiktok.com/@mastersonscarcare/video/7646586455166291214"},
+  {"rank":2,"handle":"lifefueltv","product":"Breezy x Gordo","views":19419,"likes":6,"gmv":166.62,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7654341175721184543.jpg","url":"https://www.tiktok.com/@lifefueltv/video/7654341175721184543"},
+  {"rank":3,"handle":"hellkat1114","product":"Kingz Case","views":15133,"likes":3,"gmv":88.63,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7646502824750206221.jpg","url":"https://www.tiktok.com/@hellkat1114/video/7646502824750206221"},
+  {"rank":4,"handle":"thevmcproductions","product":"Stash Capsule","views":13454,"likes":82,"gmv":19.57,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7657431731158486302.jpg","url":"https://www.tiktok.com/@thevmcproductions/video/7657431731158486302"},
+  {"rank":5,"handle":"natemows","product":"Stash Capsule","views":8039,"likes":42,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7676986568686554399.jpg","url":"https://www.tiktok.com/@natemows/video/7676986568686554399"},
+  {"rank":6,"handle":"biometricvote","product":"Kingz Case","views":6693,"likes":0,"gmv":96.38,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7647668993620315422.jpg","url":"https://www.tiktok.com/@biometricvote/video/7647668993620315422"},
+  {"rank":7,"handle":"lifefueltv","product":"Stash Capsule","views":5724,"likes":5,"gmv":61.70,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7656506018003717407.jpg","url":"https://www.tiktok.com/@lifefueltv/video/7656506018003717407"},
+  {"rank":8,"handle":"hellkat1114","product":"Kingz Case","views":5244,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7652508917662076174.jpg","url":"https://www.tiktok.com/@hellkat1114/video/7652508917662076174"},
+  {"rank":9,"handle":"natemows","product":"Stash Capsule","views":5113,"likes":1,"gmv":8.93,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7653956214249819423.jpg","url":"https://www.tiktok.com/@natemows/video/7653956214249819423"},
+  {"rank":10,"handle":"mikewilmaca","product":"Stash Capsule","views":4976,"likes":2,"gmv":57.47,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7645806890563243294.jpg","url":"https://www.tiktok.com/@mikewilmaca/video/7645806890563243294"},
+  {"rank":11,"handle":"natemows","product":"Stash Capsule","views":4456,"likes":2,"gmv":39.41,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7652775746842217758.jpg","url":"https://www.tiktok.com/@natemows/video/7652775746842217758"},
+  {"rank":12,"handle":"melissabullins49","product":"Stash Capsule","views":4259,"likes":0,"gmv":21.02,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7650283286920531213.jpg","url":"https://www.tiktok.com/@melissabullins49/video/7650283286920531213"},
+  {"rank":13,"handle":"lifefueltv","product":"Stash Capsule","views":4159,"likes":1,"gmv":23.77,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7659251070287301918.jpg","url":"https://www.tiktok.com/@lifefueltv/video/7659251070287301918"},
+  {"rank":14,"handle":"natemows","product":"Stash Capsule","views":2927,"likes":6,"gmv":16.43,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7677981689020288286.jpg","url":"https://www.tiktok.com/@natemows/video/7677981689020288286"},
+  {"rank":15,"handle":"natemows","product":"Stash Capsule","views":2357,"likes":1,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7659901496732978462.jpg","url":"https://www.tiktok.com/@natemows/video/7659901496732978462"},
+  {"rank":16,"handle":"tubrstorage","product":"Halftime Hideout","views":1697,"likes":0,"gmv":24.83,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7658366176724012302.jpg","url":"https://www.tiktok.com/@tubrstorage/video/7658366176724012302"},
+  {"rank":17,"handle":"latinmamab","product":"Kingz Case","views":1542,"likes":14,"gmv":16.81,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7678366740786482462.jpg","url":"https://www.tiktok.com/@latinmamab/video/7678366740786482462"},
+  {"rank":18,"handle":"mmurrayy1992","product":"Gordo Case","views":1537,"likes":0,"gmv":26.94,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7646944928043420959.jpg","url":"https://www.tiktok.com/@mmurrayy1992/video/7646944928043420959"},
+  {"rank":19,"handle":"cruselawncare","product":"Stash Capsule","views":1481,"likes":0,"gmv":40.28,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7657252592107441421.jpg","url":"https://www.tiktok.com/@cruselawncare/video/7657252592107441421"},
+  {"rank":20,"handle":"xrebelchild","product":"Stash Capsule","views":1458,"likes":5,"gmv":19.13,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7658704803819769118.jpg","url":"https://www.tiktok.com/@xrebelchild/video/7658704803819769118"},
+  {"rank":21,"handle":"lifefueltv","product":"Breezy x Gordo","views":1357,"likes":1,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7652849676047142174.jpg","url":"https://www.tiktok.com/@lifefueltv/video/7652849676047142174"},
+  {"rank":22,"handle":"ttcvibesandmore","product":"Stash Capsule","views":1351,"likes":0,"gmv":11.42,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7655808468875578654.jpg","url":"https://www.tiktok.com/@ttcvibesandmore/video/7655808468875578654"},
+  {"rank":23,"handle":"katelynreagin0","product":"Gordo Case","views":1327,"likes":94,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7677698278053465357.jpg","url":"https://www.tiktok.com/@katelynreagin0/video/7677698278053465357"},
+  {"rank":24,"handle":"partyin386","product":"Stash Capsule","views":1249,"likes":6,"gmv":10.83,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7677243184858041631.jpg","url":"https://www.tiktok.com/@partyin386/video/7677243184858041631"},
+  {"rank":25,"handle":"melissabullins49","product":"Kingz Case","views":1224,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7651811785087175949.jpg","url":"https://www.tiktok.com/@melissabullins49/video/7651811785087175949"},
+  {"rank":26,"handle":"ky_gill_slayer","product":"Stash Capsule","views":1224,"likes":1,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7674284682288041246.jpg","url":"https://www.tiktok.com/@ky_gill_slayer/video/7674284682288041246"},
+  {"rank":27,"handle":"b_radk1970","product":"Stash Capsule","views":1220,"likes":3,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7677386071247768863.jpg","url":"https://www.tiktok.com/@b_radk1970/video/7677386071247768863"},
+  {"rank":28,"handle":"cbolden1974","product":"Gordo Case","views":1186,"likes":0,"gmv":36.21,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7647326755124038926.jpg","url":"https://www.tiktok.com/@cbolden1974/video/7647326755124038926"},
+  {"rank":29,"handle":"lifefueltv","product":"Kingz Case","views":1139,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7655096625546792223.jpg","url":"https://www.tiktok.com/@lifefueltv/video/7655096625546792223"},
+  {"rank":30,"handle":"itcomesinwavves","product":"Gordo Case","views":1136,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7647643868212645133.jpg","url":"https://www.tiktok.com/@itcomesinwavves/video/7647643868212645133"},
+  {"rank":31,"handle":"777lapiedra","product":"Stash Capsule","views":1097,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7656650643360189727.jpg","url":"https://www.tiktok.com/@777lapiedra/video/7656650643360189727"},
+  {"rank":32,"handle":"luckyyshops","product":"Plant People Mini","views":1036,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7647572340095716638.jpg","url":"https://www.tiktok.com/@luckyyshops/video/7647572340095716638"},
+  {"rank":33,"handle":"jenshopsalot","product":"Kingz Case","views":963,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7650839917756419358.jpg","url":"https://www.tiktok.com/@jenshopsalot/video/7650839917756419358"},
+  {"rank":34,"handle":"carlyfurfur","product":"Stash Capsule","views":929,"likes":10,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7675216347093159199.jpg","url":"https://www.tiktok.com/@carlyfurfur/video/7675216347093159199"},
+  {"rank":35,"handle":"bargainzlive","product":"Stash Capsule","views":901,"likes":2,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7659629468356463886.jpg","url":"https://www.tiktok.com/@bargainzlive/video/7659629468356463886"},
+  {"rank":36,"handle":"tubrstorage","product":"Halftime Hideout","views":871,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7658848790324972814.jpg","url":"https://www.tiktok.com/@tubrstorage/video/7658848790324972814"},
+  {"rank":37,"handle":"tubrstorage","product":"Breezy x Gordo","views":867,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7657749248053710094.jpg","url":"https://www.tiktok.com/@tubrstorage/video/7657749248053710094"},
+  {"rank":38,"handle":"carlyfurfur","product":"Stash Capsule","views":850,"likes":4,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7676678816483249439.jpg","url":"https://www.tiktok.com/@carlyfurfur/video/7676678816483249439"},
+  {"rank":39,"handle":"tubrstorage","product":"Host Cities Stash","views":846,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7658059522359053581.jpg","url":"https://www.tiktok.com/@tubrstorage/video/7658059522359053581"},
+  {"rank":40,"handle":"partyin386","product":"Stash Capsule","views":825,"likes":6,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7677346375339707679.jpg","url":"https://www.tiktok.com/@partyin386/video/7677346375339707679"},
+  {"rank":41,"handle":"molly_jo_from_kokomo","product":"Stash Capsule","views":820,"likes":0,"gmv":17.46,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7658077102406749454.jpg","url":"https://www.tiktok.com/@molly_jo_from_kokomo/video/7658077102406749454"},
+  {"rank":42,"handle":"tubrstorage","product":"Breezy x Gordo","views":819,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7658120292010609934.jpg","url":"https://www.tiktok.com/@tubrstorage/video/7658120292010609934"},
+  {"rank":43,"handle":"tubrstorage","product":"Breezy x Gordo","views":818,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7657284853037157645.jpg","url":"https://www.tiktok.com/@tubrstorage/video/7657284853037157645"},
+  {"rank":44,"handle":"tubrstorage","product":"Host Cities Stash","views":812,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7657688199837338894.jpg","url":"https://www.tiktok.com/@tubrstorage/video/7657688199837338894"},
+  {"rank":45,"handle":"tubrstorage","product":"Host Cities Stash","views":808,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7658474440748993805.jpg","url":"https://www.tiktok.com/@tubrstorage/video/7658474440748993805"},
+  {"rank":46,"handle":"billy.cares","product":"Stash Capsule","views":797,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7657329346033585421.jpg","url":"https://www.tiktok.com/@billy.cares/video/7657329346033585421"},
+  {"rank":47,"handle":"hubbardvideos","product":"Gordo Case","views":793,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7657353620698041613.jpg","url":"https://www.tiktok.com/@hubbardvideos/video/7657353620698041613"},
+  {"rank":48,"handle":"cityboytristan","product":"Stash Capsule","views":770,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7655793531872759054.jpg","url":"https://www.tiktok.com/@cityboytristan/video/7655793531872759054"},
+  {"rank":49,"handle":"cruselawncare","product":"Stash Capsule","views":718,"likes":0,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7657606501774806285.jpg","url":"https://www.tiktok.com/@cruselawncare/video/7657606501774806285"},
+  {"rank":50,"handle":"xrebelchild","product":"Stash Capsule","views":712,"likes":2,"gmv":0,"thumb":"https://thumbnails.reacherapp.com/thumbnails/7659883233034734878.jpg","url":"https://www.tiktok.com/@xrebelchild/video/7659883233034734878"}
+]
+</script>
+
+<footer>
+  <p>Halo / off-platform lift (branded search, paid CAC/ROAS, direct-traffic attribution) isn't shown — Reacher doesn't expose that for this shop's connected channels.</p>
+  <p>Source: Reacher MCP (shop_id 7903, "Tubr Storage") · data through 2026-08-27 · generated 2026-08-29 · Year to date view and Units tab pulled live from Reacher on 2026-08-31. This is a point-in-time export — ask Claude to regenerate it for fresh numbers.</p>
+</footer>
+
+<script>
+const DATA = {
+  program_health: {
+    "7d":  { range: ["2026-08-21","2026-08-27"], label: "Last 7 days", affiliate_gmv: 427.07, affiliate_gmv_delta_pct: 36.71,
+             videos_posted: 28, videos_posted_delta_pct: -49.09,
+             creators_posting_videos: 13, video_views: 48994,
+             samples_approved: 44, sample_requests: 67, creators_reached: 2293,
+             units_sold: 23, units_sold_delta_pct: 64.29,
+             gmv_per_video: 1.5739285714285713, gmv_per_video_delta_pct: 100.0,
+             creators_converting: 3, creators_converting_delta_pct: 100.0 },
+    "mtd": { range: ["2026-08-01","2026-08-27"], label: "Month to date", affiliate_gmv: 1114.95, affiliate_gmv_delta_pct: 82.04,
+             videos_posted: 90, videos_posted_delta_pct: 114.29,
+             creators_posting_videos: 20, video_views: 178852,
+             samples_approved: 64, sample_requests: 96, creators_reached: 6364,
+             units_sold: 57, units_sold_delta_pct: 72.73,
+             gmv_per_video: 0.4896666666666667, gmv_per_video_delta_pct: -43.39,
+             creators_converting: 3, creators_converting_delta_pct: 50.0 },
+    "ytd": { range: ["2026-01-01","2026-08-27"], label: "Year to date", affiliate_gmv: 13517.44, affiliate_gmv_delta_pct: null,
+             videos_posted: 603, videos_posted_delta_pct: null,
+             creators_posting_videos: 250, video_views: 1709682,
+             samples_approved: 345, sample_requests: 927, creators_reached: 26976,
+             units_sold: 943, units_sold_delta_pct: null,
+             gmv_per_video: 22.416982421227197, gmv_per_video_delta_pct: null,
+             creators_converting: 56, creators_converting_delta_pct: null }
+  },
+  outreach_funnel: {
+    "7d":  { reached: 2293, requested: 67, approved: 44, posted: 13, sales: 3 },
+    "mtd": { reached: 6364, requested: 96, approved: 64, posted: 20, sales: 3 },
+    "ytd": { reached: 26976, requested: 927, approved: 345, posted: 250, sales: 56 }
+  },
+  top_videos_30d: [
+    { handle: "natemows", gmv: 227.43, views: 24210, likes: 79, engagement: 0.38, url: "https://www.tiktok.com/@natemows/video/7624197032684588318" },
+    { handle: "natemows", gmv: 211.98, views: 13905, likes: 83, engagement: 0.63, url: "https://www.tiktok.com/@natemows/video/7635824429519441183" },
+    { handle: "clutchshopmark", gmv: 155.3, views: 7895, likes: 29, engagement: 0.38, url: "https://www.tiktok.com/@clutchshopmark/video/7640544289264536845" },
+    { handle: "natemows", gmv: 140.56, views: 9285, likes: 21, engagement: 0.23, url: "https://www.tiktok.com/@natemows/video/7633078339925855518" },
+    { handle: "tubrstorage", gmv: 46.21, views: 0, likes: 0, engagement: 0.0, url: "https://www.tiktok.com/@tubrstorage/video/7602721438121970957" },
+    { handle: "meganbabyg", gmv: 42.09, views: 346, likes: 4, engagement: 1.16, url: "https://www.tiktok.com/@meganbabyg/video/7632517573103455519" },
+    { handle: "natemows", gmv: 37.84, views: 1573, likes: 3, engagement: 0.19, url: "https://www.tiktok.com/@natemows/video/7645320686449216799" },
+    { handle: "hellkat1114", gmv: 37.69, views: 1391, likes: 4, engagement: 0.36, url: "https://www.tiktok.com/@hellkat1114/video/7646502824750206221" },
+    { handle: "biometricvote", gmv: 34.09, views: 377, likes: 0, engagement: 0.0, url: "https://www.tiktok.com/@biometricvote/video/7647668993620315422" },
+    { handle: "tubrstorage", gmv: 24.83, views: 728, likes: 0, engagement: 0.0, url: "https://www.tiktok.com/@tubrstorage/video/7658366176724012302" }
+  ],
+  leaderboard: [
+    { handle: "natemows", status: "Completed", gmv: 3081.01, commission: 49.25, videos: 10, views: 961786, followers: 7424 },
+    { handle: "lifefueltv", status: "Sample Rejected", gmv: 329.28, commission: 6.28, videos: 7, views: 36686, followers: 0 },
+    { handle: "clutchshopmark", status: "Sample Request Expired", gmv: 241.92, commission: 11.67, videos: 1, views: 19145, followers: 46325 },
+    { handle: "trenditreasures", status: "Completed", gmv: 158.26, commission: 0.0, videos: 2, views: 21007, followers: 6555 },
+    { handle: "hellkat1114", status: "Completed", gmv: 120.6, commission: 2.85, videos: 2, views: 20377, followers: 25347 },
+    { handle: "meganbabyg", status: "Completed", gmv: 112.83, commission: 2.55, videos: 10, views: 23189, followers: 12318 },
+    { handle: "tiffanyann111", status: "Completed", gmv: 111.82, commission: 0.0, videos: 2, views: 18275, followers: 0 },
+    { handle: "shantel..omg", status: "Completed", gmv: 85.6, commission: 0.0, videos: 3, views: 11213, followers: 5845 },
+    { handle: "biometricvote", status: "Sample Cancelled", gmv: 73.29, commission: 0.0, videos: 4, views: 7596, followers: 47994 },
+    { handle: "melissabullins49", status: "Completed", gmv: 62.22, commission: 0.0, videos: 3, views: 9204, followers: 5902 },
+    { handle: "nextgenthreads", status: "Completed", gmv: 61.9, commission: 0.0, videos: 1, views: 5413, followers: 76959 },
+    { handle: "mikewilmaca", status: "Completed", gmv: 57.47, commission: 0.0, videos: 1, views: 4976, followers: 0 },
+    { handle: "derickhughes", status: "Completed", gmv: 50.95, commission: 0.0, videos: 1, views: 7193, followers: 9556 },
+    { handle: "xrebelchild", status: "Completed", gmv: 50.15, commission: 2.85, videos: 8, views: 13081, followers: 9106 },
+    { handle: "cruselawncare", status: "Showcasing Product", gmv: 40.28, commission: 0.0, videos: 6, views: 3419, followers: null }
+  ],
+  quiet_creators: ["manna__pb32","mybestintentions","maesmusthaves7","ivofinds","daniellemoreno4","cartcrushfinds","viralvaultshop4","bargainzlive","daven8850","b_radk1970","molly_jo_from_kokomo","hubbardvideos"],
+  creator_levels: { l0: 88, l1: 116, l2: 18, l3: 3, l4: 2, l5: 3, l6: 0, l7: 0 },
+  pipeline: { overdue: 10, expiring: 0, completionRate: 82.5, cancelled: 487, totalCrmAffiliates: 818 }
+};
+
+function fmtMoney(n) { return "$" + Number(n).toLocaleString(undefined, {maximumFractionDigits: 2}); }
+function fmtDelta(pct) {
+  if (pct === null || pct === undefined) return `<span class="delta na">no prior window</span>`;
+  const cls = pct >= 0 ? "up" : "down";
+  const arrow = pct >= 0 ? "↑" : "↓";
+  return `<span class="delta ${cls}">${arrow} ${Math.abs(pct).toFixed(1)}%</span>`;
+}
+
+let currentPeriod = "7d";
+document.querySelectorAll("#period-tabs .tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentPeriod = btn.dataset.period;
+    document.querySelectorAll("#period-tabs .tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    render();
+  });
+});
+document.querySelectorAll("#page-tabs .page-tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#page-tabs .page-tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("page-dashboard").classList.toggle("hidden", btn.dataset.page !== "dashboard");
+    document.getElementById("page-creators").classList.toggle("hidden", btn.dataset.page !== "creators");
+    document.getElementById("page-gallery").classList.toggle("hidden", btn.dataset.page !== "gallery");
+    document.getElementById("page-units").classList.toggle("hidden", btn.dataset.page !== "units");
+    document.getElementById("page-opportunities").classList.toggle("hidden", btn.dataset.page !== "opportunities");
+    document.getElementById("page-samples").classList.toggle("hidden", btn.dataset.page !== "samples");
+  });
+});
+
+// accent blue, blue tint, neutral — one accent, per brand guidelines. The neutral swatch is read live
+// off the --chart-neutral token so it stays a solid, legible fill in both light and dark themes
+// (a literal dark hex here would nearly vanish against a dark page background).
+function chartColors() {
+  const cs = getComputedStyle(document.documentElement);
+  const neutral = cs.getPropertyValue("--chart-neutral").trim() || "#0B0D12";
+  return ["#2447FF", "#7C90FF", neutral];
+}
+
+function renderCreatorsPage() {
+  document.getElementById("leaderboard-body").innerHTML = DATA.leaderboard.map(c => `
+    <tr><td>${c.handle}</td><td>${c.status}</td><td>${c.gmv.toFixed(2)}</td>
+    <td>${c.commission === null ? "—" : c.commission.toFixed(2)}</td><td>${c.videos}</td>
+    <td>${c.views.toLocaleString()}</td><td>${c.followers === null ? "—" : c.followers.toLocaleString()}</td></tr>
+  `).join("");
+
+  document.getElementById("quiet-creators").innerHTML = DATA.quiet_creators.map(h =>
+    `<a class="chip" href="https://www.tiktok.com/@${h}" target="_blank">@${h}</a>`
+  ).join("");
+
+  const lv = DATA.creator_levels;
+  const levels = [["L0", lv.l0], ["L1", lv.l1], ["L2", lv.l2], ["L3", lv.l3], ["L4+", lv.l4+lv.l5+lv.l6+lv.l7]];
+  const maxLv = Math.max(...levels.map(l => l[1]));
+  const colors = chartColors();
+  document.getElementById("level-bars").innerHTML = levels.map((l, i) => {
+    const pct = maxLv ? Math.max((l[1] / maxLv * 100), l[1] > 0 ? 8 : 0) : 0;
+    return `<div class="bar-row"><div class="bar-label">${l[0]}</div><div class="bar-track">
+      <div class="bar-fill" style="width:${pct}%; background:${colors[i % 3]}">${l[1]}</div></div></div>`;
+  }).join("");
+}
+renderCreatorsPage();
+
+const GALLERY = JSON.parse(document.getElementById("gallery-data").textContent);
+const STRATEGY = [
+  { title: "One creator is carrying the program — diversify fast.", body: "@natemows alone drove $3,033 of the trailing 90-day affiliate GMV (roughly 61% of it), almost entirely from 3 videos. That's a concentration risk: if he stops posting, GMV falls off a cliff. Get 2-3 more creators making the same style of video (“smell-proof capsule” hook) so the program isn't a single-creator bet." },
+  { title: "GMV is falling every window, and it's not a base-rate illusion.", body: "Affiliate GMV is down 37% over 30 days and 40% over 90 days — these are real percentage swings on a shop already doing thousands in monthly GMV, not small-number noise. Videos posted are also down (-49% week-over-week). Outreach volume or creative fatigue is worth investigating before the next automation batch goes out." },
+  { title: "The Tübr Stash capsule is doing nearly 90% of the work.", body: "The Stash All-Purpose capsule generated $4,398 of $4,952 in 90-day affiliate GMV (89%) and pulled the most sample requests (97) and approvals (36). The rest of the 10+ SKU catalog — including 5 co-branded collabs — is essentially dormant. Consider consolidating sample budget toward Stash variants and testing why the other SKUs aren't converting." },
+  { title: "Reach-to-request is the biggest funnel leak, not approval or posting.", body: "Over 90 days, 13,593 creators were reached but only 248 requested a sample (1.8%) — yet of those, 41% got approved and 71% of approved creators actually posted. DM reply rate sits at 0% and TC reply rate around 1%. The bottleneck is getting a response at all, not what happens after a creator says yes." },
+  { title: "The golf collab draws views but hasn't converted.", body: "The Breezy x Gordo golf-themed video pulled 16,303 views with $0 GMV, and the golf-branded SKUs (Breezy x Gordo cases) show 0 units sold across every window checked. Before sampling more golf creators, it may be worth confirming the golf audience is actually a fit for this product, or testing a different hook with them." }
+];
+
+function renderGallery() {
+  document.getElementById("gallery-grid").innerHTML = GALLERY.map(v => `
+    <a class="vcard" href="${v.url}" target="_blank">
+      <div class="thumb-wrap">
+        <img src="${v.thumb}" alt="${v.handle} video thumbnail" loading="lazy">
+        <div class="rank">#${v.rank} by views</div>
+        ${v.gmv > 0 ? `<div class="sale-tag">Drove a sale</div>` : ""}
+      </div>
+      <div class="body">
+        <div class="handle">@${v.handle}</div>
+        <div class="product-tag">${v.product}</div>
+        <div class="stats"><span><strong>${v.views.toLocaleString()}</strong> views</span><span><strong>${v.likes}</strong> likes</span>${v.gmv > 0 ? `<span><strong>$${v.gmv.toFixed(2)}</strong> GMV</span>` : ""}</div>
+      </div>
+    </a>
+  `).join("");
+
+  document.getElementById("strategy-list").innerHTML = STRATEGY.map(s =>
+    `<li><strong>${s.title}</strong><br>${s.body}</li>`
+  ).join("");
+}
+renderGallery();
+
+const UNIT_GMV = [
+  { name: "Stash Capsule (flagship)", gmv: 4434.00, unitsSold: 279, videos: 76, samples: 38, ctr: 4.12, conv: 1.00 },
+  { name: "Kingz Case (Airtight Seal)", gmv: 231.00, unitsSold: 14, videos: 21, samples: 23, ctr: 2.62, conv: 2.67 },
+  { name: "Plant People Mini", gmv: 158.00, unitsSold: 9, videos: 6, samples: 0, ctr: 1.38, conv: 3.70 },
+  { name: "Gordo — Airtight Travel Case", gmv: 147.00, unitsSold: 5, videos: 26, samples: 12, ctr: 2.46, conv: 1.44 },
+  { name: "Host Cities Stash (Soccer LE)", gmv: 18.00, unitsSold: 1, videos: 11, samples: 0, ctr: 1.96, conv: 1.88 },
+  { name: "Halftime Hideout (meme collab)", gmv: 14.00, unitsSold: 1, videos: 1, samples: 0, ctr: 7.18, conv: 0.11 }
+];
+const UNIT_ZERO_GMV_SUMMARY = { count: 25, videos: 38 };
+
+const HOOKS = [
+  { title: "Discreet / smell-proof everyday carry — the dominant hook", gmv: 2868.61, views: 321864, orders: 154,
+    body: "Five natemows videos run near-identical openers — “If you don't want your bag/pocket smelling like what's inside… this keeps everything sealed up tight and protected” — leading with the odor/discretion problem before the product is even named. Those five videos alone account for more GMV, views, and orders than every other angle in the top 20 combined." },
+  { title: "Waterproof / weatherproof for travel and outdoors", gmv: 497.31, views: 55842, orders: 28,
+    body: "Six of the top-20 videos (lifefueltv, tiffanyann111, tubrstorage, hellkat1114) reframe the same case around water and weather instead of smell — “keeps everything protected, dry… vacuum sealed and waterproof,” “IP65-rated, keeps your cigars bone-dry,” golf-course/road-trip use. It's the clear #2 angle, at about a fifth of the discretion hook's GMV." },
+  { title: "A hook does real work — hashtag-only posts barely convert", gmv: 138.47, views: 12067, orders: 8,
+    body: "biometricvote's video is just emoji hashtags (#tubr #actives) and meganbabyg's two videos lean on #gardening/#green tags with no spoken angle — combined they drove $138.47 versus the thousands each named hook produced. Putting the product on screen isn't enough; the videos that state a problem in the first line are the ones carrying the program." },
+  { title: "Golf and celebrity-collab angles aren't landing yet", gmv: 0, views: 0, orders: 0,
+    body: "None of the Breezy x Gordo golf SKUs or the newer Marlon Wayans / Liga Tridente / Wabbit collab SKUs cracked the top 20 by GMV — consistent with the product table above, where 25 listings (38 videos combined) sold zero units in 90 days. Whatever hook those videos use, it isn't the discretion or weatherproofing angle that's actually converting on this shop." }
+];
+
+function renderUnitsPage() {
+  document.getElementById("unit-gmv-body").innerHTML = UNIT_GMV.map(u => `
+    <tr><td>${u.name}</td><td>${u.gmv.toFixed(2)}</td><td>${u.unitsSold}</td><td>${u.videos}</td>
+    <td>${u.samples}</td><td>${u.ctr.toFixed(2)}%</td><td>${u.conv.toFixed(2)}%</td></tr>
+  `).join("");
+  document.getElementById("unit-zero-caption").textContent =
+    `The other ${UNIT_ZERO_GMV_SUMMARY.count} listings — including every golf-collab and celebrity-collab SKU — combined for ${UNIT_ZERO_GMV_SUMMARY.videos} videos and $0 GMV in this window.`;
+
+  document.getElementById("hooks-list").innerHTML = HOOKS.map(h => `
+    <li><strong>${h.title}</strong><br>${h.body}<br>
+    <span style="font-size:0.85rem"><strong>In this window:</strong> ${fmtMoney(h.gmv)} GMV · ${h.views.toLocaleString()} views · ${h.orders} orders</span></li>
+  `).join("");
+}
+renderUnitsPage();
+
+const SPS = {
+  score: 4.6, tier: "Excellent", percentile: 90, asOf: "2026-08-27",
+  dimensions: [
+    { name: "Product satisfaction", score: 4.5, status: "Excellent", weight: 42 },
+    { name: "Fulfillment and logistics", score: 4.8, status: "Excellent", weight: 41 },
+    { name: "Customer service", score: 4.2, status: "Good", weight: 17 }
+  ]
+};
+
+const OPPORTUNITIES = [
+  { title: "Turn on Spark Ads with content that's already proven itself", tag: "Not yet running",
+    body: "There are 0 GMV Max (TikTok Smart+) campaigns and 0 Spark Codes on file for this shop — $0 paid spend is amplifying a video pool that's already worked organically (natemows's top 2 videos alone grossed $439 combined). Paid distribution behind proven hooks extends reach past the affiliate program's organic ceiling instead of waiting for reposts.",
+    requirements: "a Spark Ads authorization code from each creator/video, a TikTok Ads Manager or Business Center account linked to the shop, an ad budget and target ROAS, and listings eligible for Product Shopping Ads." },
+  { title: "Automate Spark Code collection", tag: "Not yet running",
+    body: "This is the prerequisite for the opportunity above, and Reacher flags it as unset for this shop: there's currently no systematic way to capture a creator's permission to reuse their video in ads.",
+    requirements: "a CRM group filtered to “Video Posted/Completed” status, an automated outreach message asking for the Spark Code and contact info, and a form to collect submissions (they land in Reacher's Spark Codes tab)." },
+  { title: "Stand up a Content Flywheel to raise creative quality", tag: "Not yet running",
+    body: "Also unset. A Content Flywheel shares your best-performing videos with newly onboarded creators before they film, so a new creator's first post models a hook that's already converting — like natemows's “smell-proof capsule” opener — instead of a generic unboxing.",
+    requirements: "a CRM group filtered to “Shipped” status, a curated set of 3–5 top-performing example videos, and an automated message template linking them." },
+  { title: "TikTok LIVE Shopping is untouched — 0 sessions, $0 GMV in 30 days", tag: "Untapped channel",
+    body: "Video drove $1,208.69 of the $1,574.41 shop GMV in the last 30 days, but there hasn't been a single creator or seller LIVE session in that window. LIVE is a distinct discovery surface on TikTok Shop, not a rerun of video — for a shop this concentrated in one SKU (Stash Capsule), a recurring LIVE cadence is a low-risk way to add a second demand channel.",
+    requirements: "at least one creator or in-house host willing to go live on a recurring basis, products flagged LIVE-eligible in Seller Center, a LIVE-specific commission or incentive to recruit hosts, and a consistent weekly or biweekly schedule — irregular one-offs rarely build a LIVE audience." }
+];
+
+const LISTING_OPT = [
+  { product: "Stash Capsule (flagship)", ctr: 4.12, conv: 1.00, gmvPer1k: 7.57,
+    note: "Carries 89% of 90-day affiliate GMV on 26,766 clicks but converts only 1 in 100 clickers — the single biggest lever in the catalog. A comparison chart for the capacity claim (“holds 14+ 1g prerolls”) or visible reviews/trust signals would outweigh sampling any other SKU." },
+  { product: "Halftime Hideout (meme collab)", ctr: 7.18, conv: 0.11, gmvPer1k: 1.65,
+    note: "Second-highest CTR in the catalog — the video hook pulls clicks well above average — but almost nobody buys once they land on the page. Worth a manual check of price, main image, and whether the plant-meme positioning survives the click-through." },
+  { product: "Breezy x Gordo Cigar Case", ctr: 11.83, conv: 0.04, gmvPer1k: 1.20,
+    note: "Highest CTR and lowest conversion in the shop, at the same time. Consistent with the golf-audience-fit question already flagged in Gallery — but a gap this wide is also worth a PDP check before writing the SKU off." },
+  { product: "Plant People Mini", ctr: 1.38, conv: 3.70, gmvPer1k: 10.72,
+    note: "The inverse problem: whoever clicks buys at 3–4x the rate of the flagship SKU, but the listing barely gets clicked. A title or main-image refresh could unlock demand that's already proven to convert." },
+  { product: "Bingham's Edition Gordo Aluminum", ctr: 2.67, conv: 0.00, gmvPer1k: 0.00,
+    note: "8 organic videos posted, zero sales. The creator content pipeline is working here — the page isn't. Worth a manual QA pass on price and listing content before allocating more samples." }
+];
+
+function renderStoreHealth() {
+  const colors = chartColors();
+  document.getElementById("sps-bars").innerHTML = SPS.dimensions.map(d => {
+    const pct = (d.score / 5 * 100);
+    const color = d.status === "Excellent" ? colors[0] : d.status === "Good" ? colors[1] : colors[2];
+    return `<div class="bar-row"><div class="bar-label" style="width:170px">${d.name}</div><div class="bar-track">
+      <div class="bar-fill" style="width:${pct}%; background:${color}">${d.score.toFixed(1)} · ${d.status} (${d.weight}% weight)</div></div></div>`;
+  }).join("");
+}
+renderStoreHealth();
+
+function renderOpportunitiesPage() {
+  document.getElementById("opportunities-list").innerHTML = OPPORTUNITIES.map(o => `
+    <li><strong>${o.title}</strong> <span class="pill">${o.tag}</span><br>${o.body}<br>
+    <span style="font-size:0.85rem"><strong>Requirements:</strong> ${o.requirements}</span></li>
+  `).join("");
+
+  document.getElementById("listing-opt-body").innerHTML = LISTING_OPT.map(p => `
+    <tr><td>${p.product}</td><td>${p.ctr.toFixed(2)}%</td><td>${p.conv.toFixed(2)}%</td><td>$${p.gmvPer1k.toFixed(2)}</td><td>${p.note}</td></tr>
+  `).join("");
+}
+renderOpportunitiesPage();
+
+const SAMPLES_SETUP = [
+  { product: "Stash Capsule (flagship)", req90d: 35, usedThisMonth: 15, collab: "Targeted — Target Collab" },
+  { product: "Kingz Premium Airtight Seal Case", req90d: 19, usedThisMonth: 15, collab: "Targeted — Target Collab" },
+  { product: "Gordo Anodized Aluminum Travel Case", req90d: 22, usedThisMonth: 31, collab: "Targeted — Target Collab" },
+  { product: "Gordo — Airtight Travel Storage Case", req90d: 11, usedThisMonth: 7, collab: "Targeted — Target Collab" }
+];
+
+const TARGET_COLLABS = [
+  { name: "Top sales 3154", status: "Daily limit reached", reached: 489, requested: 12, approved: 11, videos: 0, gmv: 0.00 },
+  { name: "Top sales 9170", status: "Daily limit reached", reached: 452, requested: 4, approved: 4, videos: 0, gmv: 0.00 },
+  { name: "Target Travel&Outdoor 1K+ 70%+(F)", status: "Stopped", reached: 1987, requested: 20, approved: 15, videos: 12, gmv: 27.26 },
+  { name: "New", status: "Completed — most productive to date", reached: 3819, requested: 182, approved: 99, videos: 99, gmv: 408.50 }
+];
+
+function renderSamplesPage() {
+  document.getElementById("samples-setup-body").innerHTML = SAMPLES_SETUP.map(s => `
+    <tr><td>${s.product}</td><td>${s.req90d}</td><td>${s.usedThisMonth}</td><td>${s.collab}</td></tr>
+  `).join("");
+
+  document.getElementById("target-collab-body").innerHTML = TARGET_COLLABS.map(a => `
+    <tr><td>${a.name}</td><td>${a.status}</td><td>${a.reached.toLocaleString()}</td><td>${a.requested} → ${a.approved}</td><td>${a.videos}</td><td>$${a.gmv.toFixed(2)}</td></tr>
+  `).join("");
+}
+renderSamplesPage();
+
+function render() {
+  const ph = DATA.program_health[currentPeriod];
+
+  // Needs attention
+  const alerts = [];
+  if (DATA.pipeline.overdue > 0) {
+    alerts.push({sev: "warning", msg: `${DATA.pipeline.overdue} sample requests are overdue for a post.`});
+  }
+  if (DATA.quiet_creators.length > 0) {
+    alerts.push({sev: "warning", msg: `144 creators posted once and haven't reposted in 30+ days — a large re-engagement pool (showing 12 here).`});
+  }
+  document.getElementById("alerts").innerHTML = alerts.length
+    ? alerts.map(a => `<div class="alert ${a.sev}">${a.msg}</div>`).join("")
+    : `<div class="alert ok">Nothing past your thresholds right now.</div>`;
+
+  // Program health metrics
+  document.getElementById("health-metrics").innerHTML = `
+    <div class="metric-card"><div class="label">Affiliate GMV</div><div class="value">${fmtMoney(ph.affiliate_gmv)}</div>${fmtDelta(ph.affiliate_gmv_delta_pct)}</div>
+    <div class="metric-card"><div class="label">Units sold</div><div class="value">${ph.units_sold}</div>${fmtDelta(ph.units_sold_delta_pct)}</div>
+    <div class="metric-card"><div class="label">GMV / video</div><div class="value">${fmtMoney(ph.gmv_per_video)}</div>${fmtDelta(ph.gmv_per_video_delta_pct)}</div>
+    <div class="metric-card"><div class="label">Creators converting</div><div class="value">${ph.creators_converting}</div>${fmtDelta(ph.creators_converting_delta_pct)}</div>
+    <div class="metric-card"><div class="label">Videos posted</div><div class="value">${ph.videos_posted}</div>${fmtDelta(ph.videos_posted_delta_pct)}</div>
+    <div class="metric-card"><div class="label">Creators posting</div><div class="value">${ph.creators_posting_videos}</div></div>
+    <div class="metric-card"><div class="label">Video views</div><div class="value">${ph.video_views.toLocaleString()}</div></div>
+    <div class="metric-card"><div class="label">Samples approved</div><div class="value">${ph.samples_approved}</div></div>
+  `;
+  document.getElementById("health-caption").textContent =
+    `Window: ${ph.range[0]} to ${ph.range[1]}. All figures are affiliate (creator-driven) GMV unless noted.` +
+    (currentPeriod === "ytd" ? " YTD pulled live from Reacher's timeseries endpoint (monthly granularity, summed Jan–Aug); creators posting/converting are derived counts (new creators posting per month, summed, and distinct creators with any GMV in the window) rather than a single API field, so treat them as close estimates. No prior-year window exists for this shop, so deltas aren't shown." : "");
+
+  // GMV bars across both views (static)
+  const periods = ["7d", "mtd", "ytd"];
+  const maxGmv = Math.max(...periods.map(p => DATA.program_health[p].affiliate_gmv));
+  const gmvColors = chartColors();
+  document.getElementById("gmv-bars").innerHTML = periods.map((p, i) => {
+    const v = DATA.program_health[p].affiliate_gmv;
+    const pct = maxGmv ? Math.max((v / maxGmv * 100), 10) : 10;
+    return `<div class="bar-row"><div class="bar-label" style="width:70px">${DATA.program_health[p].label}</div><div class="bar-track">
+      <div class="bar-fill" style="width:${pct}%; background:${gmvColors[i]}">${fmtMoney(v)}</div></div></div>`;
+  }).join("");
+
+  // Funnel
+  const funnel = DATA.outreach_funnel[currentPeriod];
+  document.getElementById("reached-value").textContent = funnel.reached.toLocaleString();
+  const stages = [
+    {label: "Sample requested", v: funnel.requested},
+    {label: "Approved", v: funnel.approved},
+    {label: "Posted", v: funnel.posted},
+    {label: "Drove a sale (creators)", v: funnel.sales},
+  ];
+  const maxStage = stages[0].v || 1;
+  const funnelColors = chartColors();
+  document.getElementById("funnel").innerHTML = stages.map((s, i) => {
+    const pct = Math.max((s.v / maxStage * 100), 26);
+    return `<div class="funnel-row"><div class="fbar" style="width:${pct}%; background:${funnelColors[i % 3]}"><span>${s.label}</span><span>${s.v.toLocaleString()}</span></div></div>`;
+  }).join("");
+  const r2a = stages[0].v ? (stages[1].v / stages[0].v * 100) : 0;
+  const a2p = stages[1].v ? (stages[2].v / stages[1].v * 100) : 0;
+  const p2s = stages[2].v ? (stages[3].v / stages[2].v * 100) : 0;
+  document.getElementById("funnel-conversion").innerHTML =
+    `<strong>Stage-to-stage conversion:</strong> Requested → Approved: <strong>${r2a.toFixed(1)}%</strong> · ` +
+    `Approved → Posted: <strong>${a2p.toFixed(1)}%</strong> · Posted → Sale: <strong>${p2s.toFixed(1)}%</strong> ` +
+    (funnel.requested / funnel.reached < 0.02 ? "⚠️ biggest leak is reach-to-request — very few of the creators contacted ever ask for a sample" : "");
+
+  // Top videos (static, 30d window)
+  document.getElementById("top-videos-body").innerHTML = DATA.top_videos_30d.map(v => `
+    <tr><td>${v.handle}</td><td>${v.gmv.toFixed(2)}</td><td>${v.views.toLocaleString()}</td>
+    <td>${v.likes}</td><td>${v.engagement.toFixed(1)}%</td>
+    <td><a href="${v.url}" target="_blank">Open ↗</a></td></tr>
+  `).join("");
+}
+
+render();
+</script>
+</body>
+</html>
