@@ -386,6 +386,7 @@
 const DATA = {
   program_health: {
     "7d":  { range: ["2026-08-25","2026-08-31"], label: "Last 7 days", affiliate_gmv: 229.08, affiliate_gmv_delta_pct: -48.03,
+             total_gmv: 457.20, total_gmv_delta_pct: -24.77,
              videos_posted: 43, videos_posted_delta_pct: 34.38,
              creators_posting_videos: 23, video_views: 70761,
              samples_approved: 41, sample_requests: 63, creators_reached: 1147,
@@ -393,6 +394,7 @@ const DATA = {
              gmv_per_video: 1.806046511627907, gmv_per_video_delta_pct: -1.49,
              creators_converting: 4, creators_converting_delta_pct: 100.0 },
     "mtd": { range: ["2026-08-01","2026-08-31"], label: "Month to date", affiliate_gmv: 1247.90, affiliate_gmv_delta_pct: -11.78,
+             total_gmv: 1837.47, total_gmv_delta_pct: -1.30,
              videos_posted: 119, videos_posted_delta_pct: 70.0,
              creators_posting_videos: 34, video_views: 228958,
              samples_approved: 74, sample_requests: 121, creators_reached: 6414,
@@ -400,6 +402,7 @@ const DATA = {
              gmv_per_video: 1.1456302521008404, gmv_per_video_delta_pct: -33.47,
              creators_converting: 5, creators_converting_delta_pct: 25.0 },
     "ytd": { range: ["2026-01-01","2026-09-02"], label: "Year to date", affiliate_gmv: 13761.82, affiliate_gmv_delta_pct: null,
+             total_gmv: 16993.55, total_gmv_delta_pct: null,
              videos_posted: 636, videos_posted_delta_pct: null,
              creators_posting_videos: 263, video_views: 1771998,
              samples_approved: 358, sample_requests: 969, creators_reached: 27389,
@@ -676,6 +679,7 @@ function render() {
 
   // Program health metrics
   document.getElementById("health-metrics").innerHTML = `
+    <div class="metric-card"><div class="label">Total shop GMV (all channels)</div><div class="value">${fmtMoney(ph.total_gmv)}</div>${fmtDelta(ph.total_gmv_delta_pct)}</div>
     <div class="metric-card"><div class="label">Affiliate GMV</div><div class="value">${fmtMoney(ph.affiliate_gmv)}</div>${fmtDelta(ph.affiliate_gmv_delta_pct)}</div>
     <div class="metric-card"><div class="label">Units sold</div><div class="value">${ph.units_sold}</div>${fmtDelta(ph.units_sold_delta_pct)}</div>
     <div class="metric-card"><div class="label">GMV / video</div><div class="value">${fmtMoney(ph.gmv_per_video)}</div>${fmtDelta(ph.gmv_per_video_delta_pct)}</div>
@@ -686,7 +690,7 @@ function render() {
     <div class="metric-card"><div class="label">Samples approved</div><div class="value">${ph.samples_approved}</div></div>
   `;
   document.getElementById("health-caption").textContent =
-    `Window: ${ph.range[0]} to ${ph.range[1]}. All figures are affiliate (creator-driven) GMV unless noted.` +
+    `Window: ${ph.range[0]} to ${ph.range[1]}. "Total shop GMV" is every order in the window (product-card, search, shop-tab, and LIVE included); "Affiliate GMV" below it isolates the creator-driven slice. All other figures on this page are affiliate (creator-driven) unless noted.` +
     (currentPeriod === "ytd" ? " YTD pulled live from Reacher's timeseries endpoint (monthly granularity, summed Jan–Sep); creators posting/converting are derived counts (new creators posting per month, summed, and distinct creators with any GMV in the window) rather than a single API field, so treat them as close estimates. No prior-year window exists for this shop, so deltas aren't shown." :
      currentPeriod === "mtd" ? " Reacher's newest fully settled day for this shop is 2026-08-31, so September has no settled data yet — this view shows the last full settled month (August) instead of the first two days of September. Deltas compare against the prior 31-day period." :
      " Deltas compare against the prior 7-day period, both as of Reacher's last fully settled day (2026-08-31).");
