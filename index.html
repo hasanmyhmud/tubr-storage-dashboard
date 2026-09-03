@@ -188,9 +188,6 @@
   <button class="tab" data-period="ytd">Year to date</button>
 </div>
 
-<h2>Needs attention</h2>
-<div id="alerts"></div>
-
 <h2>Program health</h2>
 <div class="metric-grid" id="health-metrics"></div>
 <div class="caption" id="health-caption" style="margin-top:0.3rem"></div>
@@ -664,18 +661,6 @@ renderSamplesPage();
 
 function render() {
   const ph = DATA.program_health[currentPeriod];
-
-  // Needs attention
-  const alerts = [];
-  if (DATA.pipeline.overdue > 0) {
-    alerts.push({sev: "warning", msg: `${DATA.pipeline.overdue} sample requests are overdue for a post.`});
-  }
-  if (DATA.quiet_creators.length > 0) {
-    alerts.push({sev: "warning", msg: `118 creators posted once and haven't reposted in 30+ days — a large re-engagement pool (showing 12 here).`});
-  }
-  document.getElementById("alerts").innerHTML = alerts.length
-    ? alerts.map(a => `<div class="alert ${a.sev}">${a.msg}</div>`).join("")
-    : `<div class="alert ok">Nothing past your thresholds right now.</div>`;
 
   // Program health metrics
   document.getElementById("health-metrics").innerHTML = `
